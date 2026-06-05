@@ -90,8 +90,9 @@ Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan t
 }
 
 Catatan Penting: 
-1. OCR bisa saja salah ketik (typo). Gunakan logika heuristik perbankan untuk mendeteksi NIK, Nama, dan Gaji.
-2. Surat perjanjian sering kali berisi banyak pasal-pasal panjang/syarat pinjaman."""
+1. JANGAN PERNAH MENGARANG DATA. Jika teks OCR berantakan atau berasal dari dokumen acak yang tidak mengandung data identitas yang jelas, kembalikan '-' untuk NIK, Nama, dan Gaji. Dilarang keras mengembalikan nama fiktif seperti 'Budi' atau 'Budi Setiawan'.
+2. OCR bisa saja salah ketik (typo). Gunakan logika heuristik perbankan untuk mendeteksi NIK (biasanya 16 digit), Nama, dan Gaji.
+3. Surat perjanjian sering kali berisi banyak pasal-pasal panjang/syarat pinjaman."""
 
         # Meminta respons Groq dengan format JSON
         chat_completion = client.chat.completions.create(
