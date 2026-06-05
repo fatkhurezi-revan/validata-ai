@@ -1,42 +1,127 @@
-from fastapi import FastAPI, File, UploadFile
+import os
+import json
+import fitz  # PyMuPDF
+import easyocr
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import asyncio
+from dotenv import load_dotenv
+from groq import Groq
 
-app = FastAPI(title="Smart-POK AI Backend")
+# Memuat variabel lingkungan (berguna untuk testing lokal membaca file .env)
+load_dotenv()
 
-# Mengizinkan Frontend (localhost:3000 atau domain Vercel) untuk memanggil API ini
+app = FastAPI(title="Smart-POK AI Backend - Real AI Mode")
+
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # PERHATIAN: Di tahap produksi, ganti "*" dengan URL Vercel Anda
+    allow_origins=["*"], # Izinkan Vercel frontend untuk mengakses
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Inisialisasi EasyOCR di luar fungsi agar model tidak di-load berulang kali setiap ada request.
+# gpu=False digunakan agar aman berjalan di tier Gratis Hugging Face Spaces (berbasis CPU).
+print("Loading EasyOCR models...")
+reader = easyocr.Reader(['id', 'en'], gpu=False)
+print("EasyOCR models loaded.")
+
+# Mempersiapkan klien Groq API
+groq_api_key = os.getenv("GROQ_API_KEY")
+if not groq_api_key:
+    print("WARNING: GROQ_API_KEY tidak ditemukan! Pastikan Anda memasukkannya di environment/secrets.")
+client = Groq(api_key=groq_api_key)
+
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)):
-    """
-    Endpoint untuk menerima unggahan PDF dan melakukan proses analisis.
-    Fase 1: Murni simulasi logika (Mock-up)
-    """
-    # 1. Simulasi delay proses memecah PDF, OCR, dan Klasifikasi AI
-    await asyncio.sleep(3)
+    # Validasi tipe file
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Hanya file berekstensi .pdf yang diperbolehkan.")
     
-    # 2. Mengembalikan response statis sesuai kerangka arsitektur MVP
-    return {
-        "kelengkapan": {
-            "KTP": True, 
-            "Slip_Gaji": True, 
-            "Surat_Perjanjian": True
-        },
-        "data": {
-            "NIK": "3202112233445566", 
-            "Nama": "Budi Setiawan", 
-            "Gaji": "Rp 10.000.000"
-        },
-        "status": "READY TO DROP"
-    }
+    try:
+        # --- LANGKAH 1 & 2: MEMBACA PDF DENGAN PYMUPDF ---
+        pdf_bytes = await file.read()
+        pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
+        
+        # Batasi hanya membaca maksimal 3 halaman pertama demi efisiensi
+        num_pages = min(3, len(pdf_document))
+        all_text_extracted = []
+        
+        # --- LANGKAH 3: KONVERSI HALAMAN KE GAMBAR LALU JALANKAN OCR ---
+        for page_num in range(num_pages):
+            page = pdf_document.load_page(page_num)
+            # Render halaman menjadi gambar (pixmap) dengan DPI 150 agar teks jelas terbaca OCR
+            pix = page.get_pixmap(dpi=150) 
+            
+            # Ubah gambar menjadi format PNG bytes agar bisa dibaca langsung oleh EasyOCR
+            img_bytes = pix.tobytes("png")
+            
+            # Jalankan EasyOCR (detail=0 membuat response berupa list of strings)
+            ocr_results = reader.readtext(img_bytes, detail=0)
+            page_text = " ".join(ocr_results)
+            all_text_extracted.append(page_text)
+            
+        pdf_document.close()
+        
+        # Gabungkan semua teks mentah yang didapat dari ketiga halaman menjadi satu paragraf panjang
+        raw_text = "\n".join(all_text_extracted)
+        
+        if not raw_text.strip():
+            raise HTTPException(status_code=400, detail="Dokumen kosong atau teks tidak dapat terbaca oleh OCR.")
+
+        # --- LANGKAH 4 & 5: ANALISIS TEKS MENGGUNAKAN GROQ API (Llama-3) ---
+        system_prompt = """Anda adalah "Smart-POK AI", sebuah asisten ekstraksi data perbankan ahli.
+Tugas Anda adalah menelaah teks acak hasil OCR dokumen kredit (KTP, Slip Gaji, Surat Perjanjian).
+
+Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan teks lain di luar JSON):
+{
+  "kelengkapan": {
+    "KTP": true/false,
+    "Slip_Gaji": true/false,
+    "Surat_Perjanjian": true/false
+  },
+  "data": {
+    "NIK": "string NIK yang ditemukan (16 digit) atau '-' jika tidak ada",
+    "Nama": "string nama yang ditemukan atau '-' jika tidak ada",
+    "Gaji": "string nominal gaji yang ditemukan atau '-' jika tidak ada"
+  },
+  "status": "Tulis 'READY TO DROP' HANYA JIKA semua KTP, Slip_Gaji, Surat_Perjanjian true, DAN NIK/Nama/Gaji ditemukan. Jika ada satu saja yang false atau tidak ada, tulis 'REJECT'."
+}
+
+Catatan Penting: 
+1. OCR bisa saja salah ketik (typo). Gunakan logika heuristik perbankan untuk mendeteksi NIK, Nama, dan Gaji.
+2. Surat perjanjian sering kali berisi banyak pasal-pasal panjang/syarat pinjaman."""
+
+        # Meminta respons Groq dengan format JSON
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Tolong ekstrak data dari teks raw OCR dokumen nasabah berikut:\n\n{raw_text}"}
+            ],
+            model="llama3-8b-8192",
+            temperature=0, # Gunakan 0 agar hasil deterministik dan stabil
+            response_format={"type": "json_object"} # Memaksa Groq mengembalikan JSON murni
+        )
+        
+        # Ambil string JSON dari Groq
+        groq_json_str = chat_completion.choices[0].message.content
+        
+        # Parsing string tersebut ke Python Dictionary
+        result_json = json.loads(groq_json_str)
+        
+        # --- LANGKAH 6: KEMBALIKAN RESPONSE JSON KE FRONTEND ---
+        return result_json
+
+    except json.JSONDecodeError:
+        print("Error: Groq API mengembalikan format JSON yang rusak.")
+        raise HTTPException(status_code=500, detail="Gagal membaca format JSON dari AI Backend.")
+        
+    except Exception as e:
+        # Tangkap semua jenis error tidak terduga lainnya
+        print(f"Server Error Exception: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Terjadi kesalahan pada server saat memproses: {str(e)}")
 
 @app.get("/")
 def root():
-    return {"message": "Smart-POK AI Backend is running"}
+    return {"message": "Smart-POK AI Backend is online and running real AI models."}
