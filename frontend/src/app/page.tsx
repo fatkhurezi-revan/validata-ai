@@ -32,7 +32,8 @@ export default function Home() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('http://localhost:8000/analyze', {
+      // Endpoint Backend di Hugging Face Spaces
+      const res = await fetch('https://revan-fatkhurezi-smart-pok-backend.hf.space/analyze', {
         method: 'POST',
         body: formData,
       });
