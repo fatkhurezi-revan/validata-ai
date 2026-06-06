@@ -104,9 +104,9 @@ Keluarkan HANYA JSON object dengan format mutlak berikut ini (tanpa penjelasan t
 Catatan Penting (WAJIB DIPATUHI): 
 1. Nilai di atas hanya contoh format. Isi dengan data aktual dari teks OCR.
 2. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada, set kelengkapannya menjadi false. Jika data spesifik tidak ditemukan, isi dengan string "-".
-3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'Nama Kepala Keluarga', atau deretan tabel NIK anggota keluarga. Jika kata-kata ini ada di teks, set "KK": true.
+3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'NO. KK', 'NOMOR KK', 'Nama Kepala Keluarga', atau deretan tabel NIK anggota keluarga. Jika salah satu kata ini ada di teks, set "KK": true.
 4. Ekstrak NIK KTP (biasanya 16 digit setelah kata NIK) dan isi ke "NIK_KTP".
-5. Ekstrak NIK dari tabel Kartu Keluarga yang NAMA-nya sesuai dengan nasabah, lalu isi ke "NIK_KK".
+5. Ekstrak NIK dari tabel Kartu Keluarga yang NAMA-nya sesuai dengan nasabah, ATAU ekstrak 16 digit angka manapun yang berada di bagian KK jika pencocokan nama gagal, lalu isi ke "NIK_KK".
 6. Status_Kecocokan_Nama bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji identik/mirip.
 7. Status_Kecocokan_NIK bernilai true HANYA JIKA NIK_KTP dan NIK_KK keduanya ditemukan dan sama persis.
 8. status harus 'READY TO DROP' HANYA JIKA KETIGA dokumen true dan KEDUA status kecocokan true. Jika salah satu gagal, set status menjadi 'REJECTED'."""
