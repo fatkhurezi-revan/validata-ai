@@ -16,6 +16,28 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [showAbout, setShowAbout] = useState(false);
 
+  const loadingMessages = [
+    "AI Bekerja...",
+    "Membaca isi dokumen dengan OCR...",
+    "Mengekstrak data dari KTP...",
+    "Menyelidiki Kartu Keluarga...",
+    "Mengekstrak nominal Gaji...",
+    "Mencocokkan NIK secara presisi...",
+    "Llama-3 merangkum hasil..."
+  ];
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
+
+  useEffect(() => {
+    if (isProcessing) {
+      const interval = setInterval(() => {
+        setLoadingMsgIdx(prev => (prev + 1) % loadingMessages.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    } else {
+      setLoadingMsgIdx(0);
+    }
+  }, [isProcessing]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const steps = [
@@ -155,6 +177,15 @@ export default function Home() {
     }
   };
 
+const resultContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.25, delayChildren: 0.2 } }
+};
+
+const resultItemVariants: Variants = {
+  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 70, damping: 14, mass: 1 } }
+};
   const containerVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.1 } }
@@ -326,7 +357,20 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h4 className="font-bold text-indigo-950 text-sm md:text-lg flex items-center gap-2 md:gap-3">
                     <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-violet-600" />
-                    AI Bekerja...
+                    <div className="relative h-6 md:h-7 overflow-hidden w-[200px] md:w-[300px]">
+                      <AnimatePresence mode="popLayout">
+                        <motion.span
+                          key={loadingMsgIdx}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                          className="absolute inset-0 flex items-center"
+                        >
+                          {loadingMessages[loadingMsgIdx]}
+                        </motion.span>
+                      </AnimatePresence>
+                    </div>
                   </h4>
                   <span className="text-2xl md:text-3xl font-black text-blue-900">{progress}%</span>
                 </div>
@@ -419,10 +463,10 @@ export default function Home() {
         {result && (
           <motion.div 
             className="space-y-6 md:space-y-8"
-            initial="hidden" animate="visible" variants={containerVariants}
+            initial="hidden" animate="visible" variants={resultContainerVariants}
           >
             <motion.div 
-              variants={itemVariants}
+              variants={resultItemVariants}
               className={`relative overflow-hidden p-6 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem] border flex flex-col items-center justify-center text-center space-y-3 md:space-y-4 shadow-2xl ${
                 result.status.includes('READY TO DROP') 
                   ? 'bg-gradient-to-b from-emerald-50 to-white border-emerald-100 shadow-emerald-900/5' 
@@ -451,9 +495,9 @@ export default function Home() {
               )}
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
               
-              <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
+              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Kelengkapan</h3>
                   <div className="p-2 md:p-2.5 bg-violet-600/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-violet-600" /></div>
@@ -465,7 +509,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
+              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Ekstraksi Data</h3>
                   <div className="p-2 md:p-2.5 bg-indigo-600/10 rounded-xl"><FileText className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /></div>
