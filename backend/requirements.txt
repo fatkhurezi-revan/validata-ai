@@ -1,3 +1,7 @@
 fastapi
 uvicorn
 python-multipart
+PyMuPDF
+easyocr
+groq
+python-dotenv
