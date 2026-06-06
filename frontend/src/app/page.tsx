@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { CloudUpload, FileUp, BadgeCheck, ShieldCheck, ShieldAlert, FileText, Loader2, XCircle, Sparkles } from 'lucide-react';
+import { CloudUpload, FileUp, BadgeCheck, ShieldCheck, ShieldAlert, FileText, Loader2, XCircle, Sparkles, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function Home() {
@@ -14,6 +14,7 @@ export default function Home() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [showAbout, setShowAbout] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -174,7 +175,7 @@ export default function Home() {
         />
         <motion.div 
           animate={{ scale: [1, 1.2, 1], rotate: [0, -5, 0] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[20%] -right-[10%] w-[70%] md:w-[40%] h-[60%] rounded-full bg-gradient-to-bl from-cyan-400/10 to-transparent blur-[100px] md:blur-[120px]" 
+          className="absolute top-[20%] -right-[10%] w-[70%] md:w-[40%] h-[60%] rounded-full bg-gradient-to-bl from-amber-400/10 to-transparent blur-[100px] md:blur-[120px]" 
         />
         <motion.div 
           animate={{ scale: [1, 1.15, 1], rotate: [0, 10, 0] }} transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
@@ -185,12 +186,12 @@ export default function Home() {
       <nav className="bg-white/60 backdrop-blur-xl border-b border-white/40 sticky top-0 z-50 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-700 to-violet-600 rounded-lg sm:rounded-xl shadow-lg shadow-indigo-500/30">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg sm:rounded-xl shadow-lg shadow-indigo-500/30">
               <ShieldCheck className="text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             {/* Placeholder Logo Baru: Ganti src dengan file logo Anda */}
-            <img src="/logo.png" alt="Validata AI Logo" width={32} height={32} className="object-contain" />
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950">Validata <span className="text-cyan-500">AI</span></span>
+            <img src="/validata-ai-logo.png" alt="ValidataAI Logo" width={32} height={32} className="object-contain" />
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950">Validata <span className="text-amber-500">AI</span></span>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex items-center justify-center">
@@ -218,12 +219,12 @@ export default function Home() {
           initial="hidden" animate="visible" variants={containerVariants}
         >
           <motion.div variants={itemVariants} className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/80 border border-slate-200 shadow-sm text-xs md:text-sm font-semibold text-indigo-950 mb-1 md:mb-2 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-500" />
+            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500" />
             Validasi Dokumen Enterprise
           </motion.div>
           <motion.h1 variants={itemVariants} className="text-3xl sm:text-5xl md:text-6xl font-black text-indigo-950 tracking-tight leading-tight drop-shadow-sm">
             Validasi Kredit <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500"> Super Cerdas</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-blue-500"> Super Cerdas</span>
           </motion.h1>
           <motion.p variants={itemVariants} className="text-slate-500 text-sm sm:text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed px-2">
             Sistem otomasi ekstraksi OCR. Memvalidasi kelengkapan serta mencocokkan NIK, Nama, dan Nominal Gaji secara real-time.
@@ -244,21 +245,21 @@ export default function Home() {
             onClick={triggerFileInput}
             className={`relative cursor-pointer rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-14 transition-all duration-500 ease-out flex flex-col items-center justify-center text-center overflow-hidden border-2 ${
               isDragging 
-                ? 'border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] bg-cyan-400/5 scale-[0.98]' 
+                ? 'border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)] bg-amber-400/5 scale-[0.98]' 
                 : 'border-slate-200 border-dashed hover:border-indigo-600/40 hover:bg-indigo-950/[0.02] hover:shadow-inner'
             }`}
           >
             {isDragging && (
               <motion.div 
                 layoutId="drag-ring"
-                className="absolute inset-0 border-4 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]/20 rounded-2xl md:rounded-3xl"
+                className="absolute inset-0 border-4 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]/20 rounded-2xl md:rounded-3xl"
                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               />
             )}
             
             <motion.div 
               animate={isDragging ? { y: -10, scale: 1.1 } : { y: 0, scale: 1 }}
-              className={`p-4 md:p-5 rounded-2xl mb-4 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-cyan-400/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
+              className={`p-4 md:p-5 rounded-2xl mb-4 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-amber-500 to-blue-500 text-white shadow-amber-400/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
             >
               <CloudUpload className="w-10 h-10 md:w-12 md:h-12" strokeWidth={1.5} />
             </motion.div>
@@ -293,7 +294,7 @@ export default function Home() {
                 initial={{opacity:0, y:20, scale:0.95}} animate={{opacity:1, y:0, scale:1}} exit={{opacity:0, scale:0.95}} transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 className="mt-6 md:mt-8 p-4 md:p-5 bg-white rounded-2xl border border-slate-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-cyan-500" />
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500" />
                 <div className="flex items-center gap-3 md:gap-4 w-full pl-2">
                   <div className="p-2 md:p-3 bg-slate-50 rounded-xl text-indigo-950 shrink-0">
                     <FileText className="w-6 h-6 md:w-7 md:h-7" />
@@ -306,7 +307,7 @@ export default function Home() {
                 <motion.button 
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                  className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-cyan-400/30 hover:shadow-[#F37021]/50 shrink-0 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-amber-500 to-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-400/30 hover:shadow-[#F37021]/50 shrink-0 flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4" />
                   Mulai Analisis
@@ -325,7 +326,7 @@ export default function Home() {
               >
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h4 className="font-bold text-indigo-950 text-sm md:text-lg flex items-center gap-2 md:gap-3">
-                    <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-cyan-500" />
+                    <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-amber-500" />
                     AI Bekerja...
                   </h4>
                   <span className="text-2xl md:text-3xl font-black text-slate-200">{progress}%</span>
@@ -334,7 +335,7 @@ export default function Home() {
                 <div className="space-y-4 md:space-y-5">
                   {steps.map((step, idx) => (
                     <div key={idx} className={`flex items-center gap-3 md:gap-4 transition-all duration-500 ${idx === activeStep ? 'opacity-100 scale-100' : idx < activeStep ? 'opacity-40' : 'opacity-20'}`}>
-                      <div className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-[10px] md:text-sm transition-colors duration-500 ${idx < activeStep ? 'bg-emerald-500 text-white' : idx === activeStep ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/40' : 'bg-slate-100 text-slate-400'}`}>
+                      <div className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-[10px] md:text-sm transition-colors duration-500 ${idx < activeStep ? 'bg-emerald-500 text-white' : idx === activeStep ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/40' : 'bg-slate-100 text-slate-400'}`}>
                         {idx < activeStep ? '✓' : idx + 1}
                       </div>
                       <span className={`font-semibold text-xs md:text-base ${idx === activeStep ? 'text-indigo-950' : 'text-slate-500'}`}>{step}</span>
@@ -344,7 +345,7 @@ export default function Home() {
 
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden relative mt-6 md:mt-8">
                   <motion.div 
-                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-700 via-indigo-500 to-cyan-400 rounded-full"
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-700 via-indigo-500 to-amber-400 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -375,20 +376,45 @@ export default function Home() {
 
         <motion.div 
           initial="hidden" animate="visible" variants={containerVariants}
-          className="bg-slate-50/50 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl md:rounded-[2rem] border border-slate-200/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.03)]"
+          className="bg-slate-50/50 backdrop-blur-md rounded-3xl md:rounded-[2rem] border border-slate-200/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.03)] overflow-hidden"
         >
-          <motion.h3 variants={itemVariants} className="text-lg md:text-xl font-bold text-indigo-950 mb-3 md:mb-5 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" />
-            Tentang Sistem Validata AI
-          </motion.h3>
-          <motion.div variants={itemVariants} className="space-y-3 md:space-y-4 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
-            <p>
-              Validata AI lahir dari observasi langsung di lapangan selama masa magang di PT Bank Rakyat Indonesia (Persero) Tbk, KCP Sukanagara. Saat ditugaskan membantu operasional bagian administrasi, ditemukan adanya celah inefisiensi pada proses kerja POK, di mana pengecekan dan pencocokan silang dokumen KTP serta Slip Gaji nasabah masih dilakukan secara manual dan memakan waktu.
-            </p>
-            <p>
-              Sebagai solusi teknologi yang konkret, sistem ekstraksi OCR berbasis AI Generatif ini dirancang untuk mengotomatisasi proses tersebut. Aplikasi ini dikembangkan tidak hanya sebagai implementasi teknis untuk Laporan Magang, tetapi juga sebagai prototipe nyata digitalisasi alur kerja perbankan untuk memangkas waktu validasi berkas dari hitungan menit menjadi hanya beberapa detik.
-            </p>
-          </motion.div>
+          <button 
+            onClick={() => setShowAbout(!showAbout)}
+            className="w-full flex items-center justify-between p-6 sm:p-8 md:p-10 text-left hover:bg-slate-100/50 transition-colors"
+          >
+            <motion.h3 variants={itemVariants} className="text-lg md:text-xl font-bold text-indigo-950 flex items-center gap-3">
+              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
+              Tentang Sistem ValidataAI
+            </motion.h3>
+            <motion.div
+              animate={{ rotate: showAbout ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+              className="p-2 rounded-full bg-slate-200/50 text-slate-500"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </motion.div>
+          </button>
+          
+          <AnimatePresence>
+            {showAbout && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="px-6 sm:px-8 md:px-10 pb-6 sm:pb-8 md:pb-10"
+              >
+                <div className="pt-4 border-t border-slate-200/50 space-y-3 md:space-y-4 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
+                  <p>
+                    ValidataAI lahir dari observasi langsung di lapangan selama masa magang di PT Bank Rakyat Indonesia (Persero) Tbk, KCP Sukanagara. Saat ditugaskan membantu operasional bagian administrasi, ditemukan adanya celah inefisiensi pada proses kerja POK, di mana pengecekan dan pencocokan silang dokumen KTP serta Slip Gaji nasabah masih dilakukan secara manual dan memakan waktu.
+                  </p>
+                  <p>
+                    Sebagai solusi teknologi yang konkret, sistem ekstraksi OCR berbasis AI Generatif ini dirancang untuk mengotomatisasi proses tersebut. Aplikasi ini dikembangkan tidak hanya sebagai implementasi teknis untuk Laporan Magang, tetapi juga sebagai prototipe nyata digitalisasi alur kerja perbankan untuk memangkas waktu validasi berkas dari hitungan menit menjadi hanya beberapa detik.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {result && (
@@ -431,7 +457,7 @@ export default function Home() {
               <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Kelengkapan</h3>
-                  <div className="p-2 md:p-2.5 bg-cyan-500/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" /></div>
+                  <div className="p-2 md:p-2.5 bg-amber-500/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-amber-500" /></div>
                 </div>
                 <div className="space-y-3 md:space-y-4">
                   <ChecklistItem label="KTP Nasabah" isTrue={result.kelengkapan.KTP} delay={0.1} />
@@ -465,7 +491,7 @@ export default function Home() {
       {/* --- FOOTER --- */}
       <footer className="w-full text-center pb-8 mt-auto z-10">
         <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide">
-          &copy; 2026 Validata AI. Designed &amp; Developed by Revan Fatkhurezi
+          &copy; 2026 ValidataAI. Designed &amp; Developed by Revan Fatkhurezi
         </p>
       </footer>
     </div>
@@ -500,7 +526,7 @@ function DataRow({ label, value, highlight = false }: { label: string, value: st
       <p className="text-[10px] md:text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-1 md:mb-2 flex items-center gap-2">
         {label}
       </p>
-      <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-cyan-500 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
+      <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-amber-500 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
         {value}
       </p>
     </div>
