@@ -185,11 +185,15 @@ export default function Home() {
       
       <nav className="bg-white/60 backdrop-blur-xl border-b border-white/40 sticky top-0 z-50 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
+          <motion.button 
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} 
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition-opacity focus:outline-none cursor-pointer"
+          >
             {/* Logo Anda */}
-            <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-sm" />
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950 ml-1">Validata<span className="text-violet-600">AI</span></span>
-          </motion.div>
+            <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm pointer-events-none select-none" />
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-indigo-950">Validata<span className="text-violet-600">AI</span></span>
+          </motion.button>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex items-center justify-center">
               {serverStatus === 'checking' && <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-violet-600 animate-pulse" />}
@@ -229,7 +233,8 @@ export default function Home() {
         </motion.div>
 
         <motion.div 
-          className="bg-white/70 backdrop-blur-2xl p-5 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,82,156,0.1)] border border-white/60 relative overflow-hidden group"
+          whileHover={{ scale: 1.01, y: -5 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          className="bg-white/70 backdrop-blur-2xl p-5 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,82,156,0.1)] hover:shadow-[0_30px_70px_-15px_rgba(0,82,156,0.15)] border border-white/60 relative overflow-hidden group"
           initial="hidden" animate="visible" variants={containerVariants}
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 transform -translate-x-full group-hover:translate-x-full ease-in-out pointer-events-none" />
@@ -281,7 +286,7 @@ export default function Home() {
               className="flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto bg-indigo-950 text-white rounded-xl font-bold text-xs md:text-sm shadow-xl shadow-[#00529C]/20 hover:shadow-[#00529C]/40 hover:bg-[#003D75] transition-all"
             >
               <FileUp className="w-4 h-4 md:w-5 md:h-5" />
-              Telusuri Komputer
+              Pilih Dokumen PDF
             </motion.div>
           </motion.div>
 
