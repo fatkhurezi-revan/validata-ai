@@ -20,7 +20,7 @@ export default function Home() {
     "Mengamankan koneksi & enkripsi...",
     "Merender halaman PDF...",
     "Mengekstrak teks via OCR...",
-    "Validasi KTP & Slip Gaji via AI..."
+    "Validasi KTP, KK & Slip Gaji..."
   ];
 
   useEffect(() => {
@@ -242,7 +242,7 @@ export default function Home() {
               {isDragging ? 'Lepaskan Berkas di Sini!' : 'Tarik & Lepaskan Berkas'}
             </h3>
             <p className="text-slate-500 text-xs sm:text-sm md:text-base mb-6 md:mb-8 max-w-md font-medium leading-relaxed px-4">
-              Unggah format <span className="font-bold text-slate-700">.PDF</span> yang memuat KTP dan Slip Gaji nasabah.
+              Unggah format <span className="font-bold text-slate-700">.PDF</span> yang memuat KTP, Kartu Keluarga, dan Slip Gaji nasabah.
             </p>
             
             <input 
@@ -392,7 +392,8 @@ export default function Home() {
                 </div>
                 <div className="space-y-3 md:space-y-4">
                   <ChecklistItem label="KTP Nasabah" isTrue={result.kelengkapan.KTP} delay={0.1} />
-                  <ChecklistItem label="Slip Gaji" isTrue={result.kelengkapan.Slip_Gaji} delay={0.2} />
+                  <ChecklistItem label="Kartu Keluarga" isTrue={result.kelengkapan.Kartu_Keluarga} delay={0.2} />
+                  <ChecklistItem label="Slip Gaji" isTrue={result.kelengkapan.Slip_Gaji} delay={0.3} />
                 </div>
               </motion.div>
 

@@ -80,12 +80,13 @@ async def analyze_document(file: UploadFile = File(...)):
 
         # --- LANGKAH 4 & 5: ANALISIS TEKS MENGGUNAKAN GROQ API (Llama-3) ---
         system_prompt = """Anda adalah "Smart-POK AI", sebuah asisten ekstraksi data perbankan ahli.
-Tugas Anda adalah menelaah teks acak hasil OCR dokumen kredit (HANYA fokus pada KTP dan Slip Gaji).
+Tugas Anda adalah menelaah teks acak hasil OCR dokumen kredit (fokus pada KTP, Slip Gaji, dan Kartu Keluarga).
 
 Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan teks lain di luar JSON):
 {
   "kelengkapan": {
     "KTP": true/false,
+    "Kartu_Keluarga": true/false,
     "Slip_Gaji": true/false
   },
   "data": {
@@ -95,7 +96,7 @@ Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan t
     "Gaji": "string nominal gaji yang ditemukan atau '-' jika tidak ada",
     "Status_Kecocokan_Nama": true/false (bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji identik atau sangat mirip)
   },
-  "status": "Tulis 'READY TO DROP' HANYA JIKA KTP dan Slip_Gaji bernilai true, DAN NIK/Gaji ditemukan, DAN Status_Kecocokan_Nama bernilai true. Jika ada satu saja kriteria yang tidak terpenuhi, tulis 'REJECT'."
+  "status": "Tulis 'READY TO DROP' HANYA JIKA KTP, Kartu_Keluarga, dan Slip_Gaji bernilai true, DAN NIK/Gaji ditemukan, DAN Status_Kecocokan_Nama bernilai true. Jika ada satu saja kriteria yang tidak terpenuhi, tulis 'REJECT'."
 }
 
 Catatan Penting: 
@@ -110,7 +111,7 @@ Catatan Penting:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Tolong ekstrak data dari teks raw OCR dokumen nasabah berikut:\n\n{raw_text}"}
             ],
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             temperature=0, # Gunakan 0 agar hasil deterministik dan stabil
             response_format={"type": "json_object"} # Memaksa Groq mengembalikan JSON murni
         )
