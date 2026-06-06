@@ -219,10 +219,7 @@ export default function Home() {
           className="text-center space-y-4 md:space-y-5"
           initial="hidden" animate="visible" variants={containerVariants}
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-violet-100 border border-violet-200 shadow-sm text-xs md:text-sm font-semibold text-violet-800 mb-1 md:mb-2 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-violet-600" />
-            Validasi Dokumen Enterprise
-          </motion.div>
+
           <motion.h1 variants={itemVariants} className="text-3xl sm:text-5xl md:text-6xl font-black text-indigo-950 tracking-tight leading-tight drop-shadow-sm">
             Validasi Kredit <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-violet-700"> Super Cerdas</span>
