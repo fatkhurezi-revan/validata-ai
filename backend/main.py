@@ -126,6 +126,28 @@ Catatan Penting (WAJIB DIPATUHI):
         # Parsing string tersebut ke Python Dictionary
         result_json = json.loads(groq_json_str)
         
+        # --- FAIL-SAFE: OVERRIDE DETEKSI MENGGUNAKAN PYTHON STRING MATCHING ---
+        # Terkadang OCR menghasilkan spasi aneh atau LLM meleset. Kita bantu dengan Python murni.
+        text_upper = raw_text.upper()
+        # Deteksi KK:
+        if not result_json.get("kelengkapan", {}).get("Kartu_Keluarga"):
+            if ("KARTU" in text_upper and "KELUARGA" in text_upper) or \
+               "KEPALA KELUARGA" in text_upper or \
+               "NO. KK" in text_upper or \
+               "NOMOR KK" in text_upper or \
+               "STATUS PERKAWINAN" in text_upper:
+                result_json["kelengkapan"]["Kartu_Keluarga"] = True
+
+        # Deteksi KTP:
+        if not result_json.get("kelengkapan", {}).get("KTP"):
+            if "PROVINSI" in text_upper and "KABUPATEN" in text_upper and "NIK" in text_upper:
+                result_json["kelengkapan"]["KTP"] = True
+
+        # Deteksi Slip Gaji:
+        if not result_json.get("kelengkapan", {}).get("Slip_Gaji"):
+            if "SLIP" in text_upper or "GAJI" in text_upper or "PENDAPATAN" in text_upper or "TAKE HOME PAY" in text_upper:
+                result_json["kelengkapan"]["Slip_Gaji"] = True
+        
         # --- VERIFIKASI STATUS SECARA DETERMINISTIK MENGGUNAKAN PYTHON ---
         # Jangan percayakan penentuan status akhir pada AI karena bisa meleset.
         kelengkapan = result_json.get("kelengkapan", {})
