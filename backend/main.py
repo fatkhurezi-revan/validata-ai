@@ -51,8 +51,8 @@ async def analyze_document(file: UploadFile = File(...)):
         pdf_bytes = await file.read()
         pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
         
-        # Batasi hanya membaca maksimal 3 halaman pertama demi efisiensi
-        num_pages = min(3, len(pdf_document))
+        # Batasi hanya membaca maksimal 5 halaman pertama demi efisiensi
+        num_pages = min(5, len(pdf_document))
         all_text_extracted = []
         
         # --- LANGKAH 3: KONVERSI HALAMAN KE GAMBAR LALU JALANKAN OCR ---
@@ -82,29 +82,31 @@ async def analyze_document(file: UploadFile = File(...)):
         system_prompt = """Anda adalah "Smart-POK AI", sebuah asisten ekstraksi data perbankan ahli.
 Tugas Anda adalah menelaah teks hasil OCR dokumen kredit. Dokumen bisa berisi KTP, Kartu Keluarga (KK), dan Slip Gaji, ATAU hanya sebagian saja (misal hanya KTP).
 
-Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan teks lain di luar JSON):
+Keluarkan HANYA JSON object dengan format mutlak berikut ini (tanpa penjelasan tambahan apapun):
 {
   "kelengkapan": {
-    "KTP": true/false (true jika ada KTP),
-    "Kartu_Keluarga": true/false (true jika ada indikasi KK),
-    "Slip_Gaji": true/false (true jika ada indikasi Slip Gaji/Penghasilan)
+    "KTP": true,
+    "Kartu_Keluarga": false,
+    "Slip_Gaji": true
   },
   "data": {
-    "NIK": "string NIK (16 digit) atau '-' jika tidak ada",
-    "Nama_KTP": "string nama di KTP atau '-' jika tidak ada",
-    "Nama_Slip_Gaji": "string nama di Slip Gaji atau '-' jika tidak ada",
-    "Gaji": "string nominal gaji atau '-' jika tidak ada",
-    "Status_Kecocokan_Nama": true/false (true HANYA jika Nama_KTP dan Nama_Slip_Gaji KEDUANYA ada dan KEDUANYA mirip)
+    "NIK": "3201010101010101",
+    "Nama_KTP": "BUDI SETIAWAN",
+    "Nama_Slip_Gaji": "BUDI SETIAWAN",
+    "Gaji": "5000000",
+    "Status_Kecocokan_Nama": true
   },
-  "status": "Tulis 'READY TO DROP' HANYA JIKA ketiga dokumen (KTP, KK, Slip_Gaji) true DAN NIK/Gaji ditemukan DAN Status_Kecocokan_Nama true. Jika salah satu saja kriteria tidak terpenuhi, tulis 'REJECT'."
+  "status": "READY TO DROP"
 }
 
-Catatan Penting: 
-1. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada (misal hanya KTP), maka set kelengkapan yang lain menjadi false dan datanya menjadi '-'.
-2. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'Nama Kepala Keluarga', atau 'No. KK'. Jika kata-kata ini ada, pastikan "Kartu_Keluarga": true.
-3. KTP ditandai dengan 'PROVINSI', 'NIK', atau format KTP standar.
-4. SLIP GAJI ditandai dengan 'Slip Gaji', 'Pendapatan', 'Gaji Pokok', 'Take Home Pay'. Jika tidak ada, maka Slip_Gaji false, Nama_Slip_Gaji '-', dan Gaji '-'.
-5. Status_Kecocokan_Nama HARUS false jika salah satu nama (KTP atau Slip Gaji) tidak ditemukan."""
+Catatan Penting (WAJIB DIPATUHI): 
+1. Nilai di atas hanya contoh format. Isi dengan data aktual dari teks OCR.
+2. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada (misal KK tidak ada), set kelengkapannya menjadi false. Jika data spesifik (seperti NIK/Gaji) tidak ditemukan, isi dengan string "-".
+3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'Nama Kepala Keluarga', atau 'No. KK'. Jika kata-kata ini ada di teks, set "Kartu_Keluarga": true.
+4. KTP ditandai dengan 'PROVINSI', 'NIK', atau format identitas standar.
+5. SLIP GAJI ditandai dengan 'Slip Gaji', 'Pendapatan', 'Gaji Pokok', 'Take Home Pay'.
+6. Status_Kecocokan_Nama bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji keduanya ditemukan (bukan '-') dan isinya identik/mirip.
+7. status harus 'READY TO DROP' HANYA JIKA KTP, Kartu_Keluarga, dan Slip_Gaji bernilai true, NIK dan Gaji ditemukan (bukan '-'), dan Status_Kecocokan_Nama bernilai true. Jika salah satu gagal, set status menjadi 'REJECTED'."""
 
         # Meminta respons Groq dengan format JSON
         client = get_groq_client()
