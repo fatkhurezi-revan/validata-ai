@@ -42,7 +42,7 @@ export default function Home() {
 
   useEffect(() => {
     
-    fetch('https://revan-fatkhurezi-smart-pok-backend.hf.space/')
+    fetch('https://revan-fatkhurezi-validata-ai-backend.hf.space/')
       .then(res => {
         if (res.ok) setServerStatus('online');
         else setServerStatus('offline');
@@ -124,7 +124,7 @@ export default function Home() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('https://revan-fatkhurezi-smart-pok-backend.hf.space/analyze', {
+      const res = await fetch('https://revan-fatkhurezi-validata-ai-backend.hf.space/analyze', {
         method: 'POST',
         body: formData,
       });

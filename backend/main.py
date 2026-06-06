@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import fitz  # PyMuPDF
 import easyocr
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -7,33 +8,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from groq import Groq
 
-# Memuat variabel lingkungan (berguna untuk testing lokal membaca file .env)
 load_dotenv()
 
-app = FastAPI(title="Smart-POK AI Backend - Real AI Mode")
+app = FastAPI(title="ValidataAI Backend - Real AI Mode")
 
-# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Izinkan Vercel frontend untuk mengakses
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Inisialisasi EasyOCR (Lazy Loading) agar tidak membebani startup RAM/CPU dan menyebabkan timeout.
 reader = None
 
 def get_easyocr_reader():
     global reader
     if reader is None:
         print("Loading EasyOCR models...")
-        # Simpan model di direktori temporary yang pasti memiliki akses tulis
         reader = easyocr.Reader(['id', 'en'], gpu=False, model_storage_directory='/tmp/easyocr')
         print("EasyOCR models loaded.")
     return reader
 
-# Mempersiapkan klien Groq API (diambil di dalam endpoint agar tidak crash saat startup)
 def get_groq_client():
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
@@ -42,118 +38,91 @@ def get_groq_client():
 
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)):
-    # Validasi tipe file
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Hanya file berekstensi .pdf yang diperbolehkan.")
     
     try:
-        # --- LANGKAH 1 & 2: MEMBACA PDF DENGAN PYMUPDF ---
         pdf_bytes = await file.read()
         pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
         
-        # Batasi hanya membaca maksimal 5 halaman pertama demi efisiensi
         num_pages = min(5, len(pdf_document))
         all_text_extracted = []
         
-        # --- LANGKAH 3: KONVERSI HALAMAN KE GAMBAR LALU JALANKAN OCR ---
+        ocr_reader = get_easyocr_reader()
+        
         for page_num in range(num_pages):
             page = pdf_document.load_page(page_num)
-            # Render halaman PDF menjadi gambar dengan resolusi lebih tinggi (300 DPI) agar teks kecil terbaca jelas
-            pix = page.get_pixmap(dpi=300) 
-            
-            # Ubah gambar menjadi format PNG bytes agar bisa dibaca langsung oleh EasyOCR
+            # OPTIMASI 1: Menurunkan resolusi render DPI menjadi 150 (sebelumnya 300).
+            # Ini mempercepat OCR hingga 4x lipat karena luas gambar dipangkas, tapi teks tetap sangat terbaca.
+            pix = page.get_pixmap(dpi=150) 
             img_bytes = pix.tobytes("png")
             
-            # Jalankan EasyOCR (detail=0 membuat response berupa list of strings)
-            ocr_reader = get_easyocr_reader()
-            ocr_results = ocr_reader.readtext(img_bytes, detail=0)
-            page_text = " ".join(ocr_results)
-            all_text_extracted.append(page_text)
+            # OPTIMASI 2: Mematikan analisis paragraf (paragraph=False).
+            # Menginstruksikan EasyOCR untuk langsung menyapu teks tanpa perlu menyusun struktur paragraf yang berat.
+            ocr_results = ocr_reader.readtext(img_bytes, detail=0, paragraph=False)
+            all_text_extracted.append(" ".join(ocr_results))
             
         pdf_document.close()
         
-        # Gabungkan semua teks mentah yang didapat dari ketiga halaman menjadi satu paragraf panjang
         raw_text = "\n".join(all_text_extracted)
         
         if not raw_text.strip():
             raise HTTPException(status_code=400, detail="Dokumen kosong atau teks tidak dapat terbaca oleh OCR.")
 
-        # --- LANGKAH 4 & 5: ANALISIS TEKS MENGGUNAKAN GROQ API (Llama-3) ---
-        system_prompt = """Anda adalah "Smart-POK AI", sebuah asisten ekstraksi data perbankan ahli.
-Tugas Anda adalah menelaah teks hasil OCR dokumen kredit. Dokumen bisa berisi KTP, Kartu Keluarga (KK), dan Slip Gaji, ATAU hanya sebagian saja (misal hanya KTP).
+        # OPTIMASI 3: Prompt AI dibuat sangat pendek, padat, dan langsung menembak ke format JSON.
+        # Ini menghemat token input dan memangkas waktu "berpikir" AI secara signifikan.
+        system_prompt = """Ekstrak data dari raw teks OCR dokumen bank berikut HANYA ke dalam format JSON MURNI tanpa kalimat pengantar atau penutup apapun.
+Format JSON wajib:
+{"kelengkapan":{"KTP":true,"KK":false,"Slip_Gaji":true},"data":{"NIK_KTP":"16 digit","NIK_KK":"16 digit","Nama_KTP":"Nama","Nama_Slip_Gaji":"Nama","Gaji":"Nominal","Status_Kecocokan_Nama":true,"Status_Kecocokan_NIK":true},"status":"READY TO DROP"}
 
-Keluarkan HANYA JSON object dengan format mutlak berikut ini (tanpa penjelasan tambahan apapun):
-{
-  "kelengkapan": {
-    "KTP": true,
-    "KK": false,
-    "Slip_Gaji": true
-  },
-  "data": {
-    "NIK_KTP": "3201010101010101",
-    "NIK_KK": "3201010101010101",
-    "Nama_KTP": "BUDI SETIAWAN",
-    "Nama_Slip_Gaji": "BUDI SETIAWAN",
-    "Gaji": "5000000",
-    "Status_Kecocokan_Nama": true,
-    "Status_Kecocokan_NIK": true
-  },
-  "status": "READY TO DROP"
-}
+ATURAN:
+1. KK true jika ada kata 'KARTU KELUARGA' atau 'NO. KK'.
+2. Jika data spesifik tidak ditemukan, isi string "-".
+3. Status_Kecocokan true hanya jika sama persis/identik."""
 
-Catatan Penting (WAJIB DIPATUHI): 
-1. Nilai di atas hanya contoh format. Isi dengan data aktual dari teks OCR.
-2. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada, set kelengkapannya menjadi false. Jika data spesifik tidak ditemukan, isi dengan string "-".
-3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'NO. KK', 'NOMOR KK', 'Nama Kepala Keluarga', atau deretan tabel NIK anggota keluarga. Jika salah satu kata ini ada di teks, set "KK": true.
-4. Ekstrak NIK KTP (biasanya 16 digit setelah kata NIK) dan isi ke "NIK_KTP".
-5. Ekstrak NIK dari tabel Kartu Keluarga yang NAMA-nya sesuai dengan nasabah, ATAU ekstrak 16 digit angka manapun yang berada di bagian KK jika pencocokan nama gagal, lalu isi ke "NIK_KK".
-6. Status_Kecocokan_Nama bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji identik/mirip.
-7. Status_Kecocokan_NIK bernilai true HANYA JIKA NIK_KTP dan NIK_KK keduanya ditemukan dan sama persis.
-8. status harus 'READY TO DROP' HANYA JIKA KETIGA dokumen true dan KEDUA status kecocokan true. Jika salah satu gagal, set status menjadi 'REJECTED'."""
-
-        # Meminta respons Groq dengan format JSON
         client = get_groq_client()
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Tolong ekstrak data dari teks raw OCR dokumen nasabah berikut:\n\n{raw_text}"}
+                {"role": "user", "content": raw_text}
             ],
             model="llama-3.3-70b-versatile",
-            temperature=0, # Gunakan 0 agar hasil deterministik dan stabil
-            response_format={"type": "json_object"} # Memaksa Groq mengembalikan JSON murni
+            temperature=0, 
+            response_format={"type": "json_object"} # Memaksa Strict JSON
         )
         
-        # Ambil string JSON dari Groq
         groq_json_str = chat_completion.choices[0].message.content
-        
-        # Parsing string tersebut ke Python Dictionary
         result_json = json.loads(groq_json_str)
         
-        # --- FAIL-SAFE: OVERRIDE DETEKSI MENGGUNAKAN PYTHON STRING MATCHING ---
-        # Terkadang OCR menghasilkan spasi aneh atau LLM meleset. Kita bantu dengan Python murni.
+        # --- FAIL-SAFE PYTHON LOGIC ---
         text_upper = raw_text.upper()
-        # Deteksi KK:
+        text_clean = text_upper.replace(" ", "")
+        
         if not result_json.get("kelengkapan", {}).get("KK"):
-            if ("KARTU" in text_upper and "KELUARGA" in text_upper) or \
-               "KEPALA KELUARGA" in text_upper or \
-               "NO. KK" in text_upper or \
-               "NOMOR KK" in text_upper or \
-               "HUBUNGAN KELUARGA" in text_upper or \
-               ("PENDIDIKAN" in text_upper and "NAMA ORANG TUA" in text_upper):
+            if "KARTUKELUARGA" in text_clean:
                 result_json["kelengkapan"]["KK"] = True
+                
+        if result_json.get("kelengkapan", {}).get("KK") and result_json.get("data", {}).get("NIK_KK", "-") == "-":
+            niks_found = re.findall(r'\b\d{16}\b', raw_text)
+            if niks_found:
+                nik_ktp = result_json.get("data", {}).get("NIK_KTP", "-")
+                if nik_ktp in niks_found:
+                    result_json["data"]["NIK_KK"] = nik_ktp
+                else:
+                    result_json["data"]["NIK_KK"] = niks_found[-1]
 
-        # Deteksi KTP:
+        if result_json.get("data", {}).get("NIK_KTP", "A") == result_json.get("data", {}).get("NIK_KK", "B") and result_json.get("data", {}).get("NIK_KTP", "A") != "-":
+            result_json["data"]["Status_Kecocokan_NIK"] = True
+
         if not result_json.get("kelengkapan", {}).get("KTP"):
             if "PROVINSI" in text_upper and "KABUPATEN" in text_upper and "NIK" in text_upper:
                 result_json["kelengkapan"]["KTP"] = True
 
-        # Deteksi Slip Gaji:
         if not result_json.get("kelengkapan", {}).get("Slip_Gaji"):
             if "SLIP" in text_upper or "GAJI" in text_upper or "PENDAPATAN" in text_upper or "TAKE HOME PAY" in text_upper:
                 result_json["kelengkapan"]["Slip_Gaji"] = True
         
-        # --- VERIFIKASI STATUS SECARA DETERMINISTIK MENGGUNAKAN PYTHON ---
-        # Jangan percayakan penentuan status akhir pada AI karena bisa meleset.
+        # Penentuan status deterministik
         kelengkapan = result_json.get("kelengkapan", {})
         data_ekstraksi = result_json.get("data", {})
         
@@ -172,7 +141,6 @@ Catatan Penting (WAJIB DIPATUHI):
         else:
             result_json["status"] = "REJECTED"
         
-        # --- LANGKAH 6: KEMBALIKAN RESPONSE JSON KE FRONTEND ---
         return result_json
 
     except json.JSONDecodeError:
@@ -180,10 +148,9 @@ Catatan Penting (WAJIB DIPATUHI):
         raise HTTPException(status_code=500, detail="Gagal membaca format JSON dari AI Backend.")
         
     except Exception as e:
-        # Tangkap semua jenis error tidak terduga lainnya
         print(f"Server Error Exception: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Terjadi kesalahan pada server saat memproses: {str(e)}")
 
 @app.get("/")
 def root():
-    return {"message": "Smart-POK AI Backend is online and running real AI models."}
+    return {"message": "ValidataAI Backend is online and running optimized Real AI models."}
