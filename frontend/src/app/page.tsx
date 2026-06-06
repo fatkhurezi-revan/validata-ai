@@ -435,7 +435,7 @@ export default function Home() {
                 </div>
                 <div className="space-y-3 md:space-y-4">
                   <ChecklistItem label="KTP Nasabah" isTrue={result.kelengkapan.KTP} delay={0.1} />
-                  <ChecklistItem label="Kartu Keluarga" isTrue={result.kelengkapan.Kartu_Keluarga} delay={0.2} />
+                  <ChecklistItem label="Kartu Keluarga" isTrue={result.kelengkapan.KK} delay={0.2} />
                   <ChecklistItem label="Slip Gaji" isTrue={result.kelengkapan.Slip_Gaji} delay={0.3} />
                 </div>
               </motion.div>
@@ -443,10 +443,12 @@ export default function Home() {
               <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Ekstraksi Data</h3>
-                  <div className="p-2 md:p-2.5 bg-indigo-950/10 rounded-xl"><FileText className="w-5 h-5 md:w-6 md:h-6 text-indigo-950" /></div>
+                  <div className="p-2 md:p-2.5 bg-indigo-600/10 rounded-xl"><FileText className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /></div>
                 </div>
                 <div className="space-y-5 md:space-y-6">
-                  <DataRow label="Nomor Induk Kependudukan" value={result.data.NIK} />
+                  <DataRow label="NIK (Sesuai KTP)" value={result.data.NIK_KTP} />
+                  <DataRow label="NIK (Di Kartu Keluarga)" value={result.data.NIK_KK} />
+                  <DataRow label="Status Kecocokan NIK" value={result.data.Status_Kecocokan_NIK === true ? "✅ MATCH (Cocok)" : result.data.Status_Kecocokan_NIK === false ? "❌ MISMATCH (Berbeda)" : "-"} />
                   <DataRow label="Nama Sesuai KTP" value={result.data.Nama_KTP} />
                   <DataRow label="Nama di Slip Gaji" value={result.data.Nama_Slip_Gaji} />
                   <DataRow label="Status Kecocokan Nama" value={result.data.Status_Kecocokan_Nama === true ? "✅ MATCH (Cocok)" : result.data.Status_Kecocokan_Nama === false ? "❌ MISMATCH (Berbeda)" : "-"} />
