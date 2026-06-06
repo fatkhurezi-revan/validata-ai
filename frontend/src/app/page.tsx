@@ -403,10 +403,10 @@ export default function Home() {
               >
                 <div className="pt-4 border-t border-slate-200/50 space-y-3 md:space-y-4 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
                   <p>
-                    ValidataAI lahir dari observasi langsung di lapangan selama masa magang di PT Bank Rakyat Indonesia (Persero) Tbk, KCP Sukanagara. Saat ditugaskan membantu operasional bagian administrasi, ditemukan adanya celah inefisiensi pada proses kerja POK, di mana pengecekan dan pencocokan silang dokumen KTP serta Slip Gaji nasabah masih dilakukan secara manual dan memakan waktu.
+                    ValidataAI bermula dari pengamatan langsung saya saat magang di PT Bank Rakyat Indonesia (Persero) Tbk, KCP Sukanagara. Saat membantu tim administrasi, saya melihat adanya proses yang memakan banyak waktu, di mana pengecekan dan pencocokan data antara KTP, Kartu Keluarga (KK), dan Slip Gaji nasabah masih dilakukan secara manual.
                   </p>
                   <p>
-                    Sebagai solusi teknologi yang konkret, sistem ekstraksi OCR berbasis AI Generatif ini dirancang untuk mengotomatisasi proses tersebut. Aplikasi ini dikembangkan tidak hanya sebagai implementasi teknis untuk Laporan Magang, tetapi juga sebagai prototipe nyata digitalisasi alur kerja perbankan untuk memangkas waktu validasi berkas dari hitungan menit menjadi hanya beberapa detik.
+                    Dari celah kerja tersebut, saya merancang prototipe sistem pintar pembaca dokumen (OCR) berbasis AI ini khusus untuk Laporan Magang saya. ValidataAI dikembangkan sebagai bukti konsep (Proof of Concept) yang menunjukkan bahwa dengan digitalisasi, waktu proses pengecekan berkas yang manual dapat dipangkas secara signifikan.
                   </p>
                 </div>
               </motion.div>
