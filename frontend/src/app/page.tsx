@@ -498,7 +498,7 @@ const resultItemVariants: Variants = {
 
       
       <footer className="w-full text-center pb-8 mt-auto z-10">
-        <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide">
+        <p className="text-[10px] sm:text-xs text-slate-400 font-medium tracking-wide">
           &copy; 2026 ValidataAI. Designed &amp; Developed by Revan Fatkhurezi
         </p>
       </footer>
