@@ -86,27 +86,30 @@ Keluarkan HANYA JSON object dengan format mutlak berikut ini (tanpa penjelasan t
 {
   "kelengkapan": {
     "KTP": true,
-    "Kartu_Keluarga": false,
+    "KK": false,
     "Slip_Gaji": true
   },
   "data": {
-    "NIK": "3201010101010101",
+    "NIK_KTP": "3201010101010101",
+    "NIK_KK": "3201010101010101",
     "Nama_KTP": "BUDI SETIAWAN",
     "Nama_Slip_Gaji": "BUDI SETIAWAN",
     "Gaji": "5000000",
-    "Status_Kecocokan_Nama": true
+    "Status_Kecocokan_Nama": true,
+    "Status_Kecocokan_NIK": true
   },
   "status": "READY TO DROP"
 }
 
 Catatan Penting (WAJIB DIPATUHI): 
 1. Nilai di atas hanya contoh format. Isi dengan data aktual dari teks OCR.
-2. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada (misal KK tidak ada), set kelengkapannya menjadi false. Jika data spesifik (seperti NIK/Gaji) tidak ditemukan, isi dengan string "-".
-3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'Nama Kepala Keluarga', atau 'No. KK'. Jika kata-kata ini ada di teks, set "Kartu_Keluarga": true.
-4. KTP ditandai dengan 'PROVINSI', 'NIK', atau format identitas standar.
-5. SLIP GAJI ditandai dengan 'Slip Gaji', 'Pendapatan', 'Gaji Pokok', 'Take Home Pay'.
-6. Status_Kecocokan_Nama bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji keduanya ditemukan (bukan '-') dan isinya identik/mirip.
-7. status harus 'READY TO DROP' HANYA JIKA KTP, Kartu_Keluarga, dan Slip_Gaji bernilai true, NIK dan Gaji ditemukan (bukan '-'), dan Status_Kecocokan_Nama bernilai true. Jika salah satu gagal, set status menjadi 'REJECTED'."""
+2. JANGAN MENGARANG DATA. Jika dokumen tertentu tidak ada, set kelengkapannya menjadi false. Jika data spesifik tidak ditemukan, isi dengan string "-".
+3. KARTU KELUARGA (KK) ditandai dengan kata kunci 'KARTU KELUARGA', 'Nama Kepala Keluarga', atau deretan tabel NIK anggota keluarga. Jika kata-kata ini ada di teks, set "KK": true.
+4. Ekstrak NIK KTP (biasanya 16 digit setelah kata NIK) dan isi ke "NIK_KTP".
+5. Ekstrak NIK dari tabel Kartu Keluarga yang NAMA-nya sesuai dengan nasabah, lalu isi ke "NIK_KK".
+6. Status_Kecocokan_Nama bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji identik/mirip.
+7. Status_Kecocokan_NIK bernilai true HANYA JIKA NIK_KTP dan NIK_KK keduanya ditemukan dan sama persis.
+8. status harus 'READY TO DROP' HANYA JIKA KETIGA dokumen true dan KEDUA status kecocokan true. Jika salah satu gagal, set status menjadi 'REJECTED'."""
 
         # Meminta respons Groq dengan format JSON
         client = get_groq_client()
@@ -130,14 +133,14 @@ Catatan Penting (WAJIB DIPATUHI):
         # Terkadang OCR menghasilkan spasi aneh atau LLM meleset. Kita bantu dengan Python murni.
         text_upper = raw_text.upper()
         # Deteksi KK:
-        if not result_json.get("kelengkapan", {}).get("Kartu_Keluarga"):
+        if not result_json.get("kelengkapan", {}).get("KK"):
             if ("KARTU" in text_upper and "KELUARGA" in text_upper) or \
                "KEPALA KELUARGA" in text_upper or \
                "NO. KK" in text_upper or \
                "NOMOR KK" in text_upper or \
                "HUBUNGAN KELUARGA" in text_upper or \
                ("PENDIDIKAN" in text_upper and "NAMA ORANG TUA" in text_upper):
-                result_json["kelengkapan"]["Kartu_Keluarga"] = True
+                result_json["kelengkapan"]["KK"] = True
 
         # Deteksi KTP:
         if not result_json.get("kelengkapan", {}).get("KTP"):
@@ -155,14 +158,16 @@ Catatan Penting (WAJIB DIPATUHI):
         data_ekstraksi = result_json.get("data", {})
         
         is_ktp_ok = kelengkapan.get("KTP") is True
-        is_kk_ok = kelengkapan.get("Kartu_Keluarga") is True
+        is_kk_ok = kelengkapan.get("KK") is True
         is_slip_ok = kelengkapan.get("Slip_Gaji") is True
         
-        is_nik_ada = data_ekstraksi.get("NIK") != "-"
+        is_nik_ktp_ada = data_ekstraksi.get("NIK_KTP") != "-"
+        is_nik_kk_ada = data_ekstraksi.get("NIK_KK") != "-"
         is_gaji_ada = data_ekstraksi.get("Gaji") != "-"
         is_nama_cocok = data_ekstraksi.get("Status_Kecocokan_Nama") is True
+        is_nik_cocok = data_ekstraksi.get("Status_Kecocokan_NIK") is True
         
-        if is_ktp_ok and is_kk_ok and is_slip_ok and is_nik_ada and is_gaji_ada and is_nama_cocok:
+        if is_ktp_ok and is_kk_ok and is_slip_ok and is_nik_ktp_ada and is_nik_kk_ada and is_gaji_ada and is_nama_cocok and is_nik_cocok:
             result_json["status"] = "READY TO DROP"
         else:
             result_json["status"] = "REJECTED"
