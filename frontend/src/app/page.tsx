@@ -16,27 +16,7 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [showAbout, setShowAbout] = useState(false);
 
-  const loadingMessages = [
-    "AI Bekerja...",
-    "Membaca isi dokumen dengan OCR...",
-    "Mengekstrak data dari KTP...",
-    "Menyelidiki Kartu Keluarga...",
-    "Mengekstrak nominal Gaji...",
-    "Mencocokkan NIK secara presisi...",
-    "Llama-3 merangkum hasil..."
-  ];
-  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
 
-  useEffect(() => {
-    if (isProcessing) {
-      const interval = setInterval(() => {
-        setLoadingMsgIdx(prev => (prev + 1) % loadingMessages.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    } else {
-      setLoadingMsgIdx(0);
-    }
-  }, [isProcessing]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -357,20 +337,7 @@ const resultItemVariants: Variants = {
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h4 className="font-bold text-indigo-950 text-sm md:text-lg flex items-center gap-2 md:gap-3">
                     <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-violet-600" />
-                    <div className="relative h-6 md:h-7 overflow-hidden w-[200px] md:w-[300px]">
-                      <AnimatePresence mode="popLayout">
-                        <motion.span
-                          key={loadingMsgIdx}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                          className="absolute inset-0 flex items-center"
-                        >
-                          {loadingMessages[loadingMsgIdx]}
-                        </motion.span>
-                      </AnimatePresence>
-                    </div>
+                    AI Bekerja...
                   </h4>
                   <span className="text-2xl md:text-3xl font-black text-blue-900">{progress}%</span>
                 </div>
