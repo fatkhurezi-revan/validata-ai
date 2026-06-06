@@ -186,12 +186,9 @@ export default function Home() {
       <nav className="bg-white/60 backdrop-blur-xl border-b border-white/40 sticky top-0 z-50 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
-            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg sm:rounded-xl shadow-lg shadow-indigo-500/30">
-              <ShieldCheck className="text-white w-5 h-5 sm:w-6 sm:h-6" />
-            </div>
-            {/* Placeholder Logo Baru: Ganti src dengan file logo Anda */}
-            <img src="/validata-ai-logo.png" alt="ValidataAI Logo" width={32} height={32} className="object-contain" />
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950">Validata <span className="text-amber-500">AI</span></span>
+            {/* Logo Anda */}
+            <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-sm" />
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950 ml-1">Validata<span className="text-amber-500">AI</span></span>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex items-center justify-center">
