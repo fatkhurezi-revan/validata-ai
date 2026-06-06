@@ -58,8 +58,8 @@ async def analyze_document(file: UploadFile = File(...)):
         # --- LANGKAH 3: KONVERSI HALAMAN KE GAMBAR LALU JALANKAN OCR ---
         for page_num in range(num_pages):
             page = pdf_document.load_page(page_num)
-            # Render halaman menjadi gambar (pixmap) dengan DPI 150 agar teks jelas terbaca OCR
-            pix = page.get_pixmap(dpi=150) 
+            # Render halaman PDF menjadi gambar dengan resolusi lebih tinggi (300 DPI) agar teks kecil terbaca jelas
+            pix = page.get_pixmap(dpi=300) 
             
             # Ubah gambar menjadi format PNG bytes agar bisa dibaca langsung oleh EasyOCR
             img_bytes = pix.tobytes("png")
@@ -135,10 +135,8 @@ Catatan Penting (WAJIB DIPATUHI):
                "KEPALA KELUARGA" in text_upper or \
                "NO. KK" in text_upper or \
                "NOMOR KK" in text_upper or \
-               "STATUS PERKAWINAN" in text_upper or \
                "HUBUNGAN KELUARGA" in text_upper or \
-               "PENDIDIKAN" in text_upper or \
-               "JENIS PEKERJAAN" in text_upper:
+               ("PENDIDIKAN" in text_upper and "NAMA ORANG TUA" in text_upper):
                 result_json["kelengkapan"]["Kartu_Keluarga"] = True
 
         # Deteksi KTP:
