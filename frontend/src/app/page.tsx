@@ -194,7 +194,7 @@ export default function Home() {
             <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm pointer-events-none select-none" />
             <span className="font-extrabold text-lg sm:text-xl tracking-tight text-indigo-950">Validata<span className="text-violet-600">AI</span></span>
           </motion.button>
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-1.5 sm:gap-3">
             <div className="relative flex items-center justify-center">
               {serverStatus === 'checking' && <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-violet-600 animate-pulse" />}
               {serverStatus === 'online' && (
@@ -206,8 +206,8 @@ export default function Home() {
               {serverStatus === 'offline' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500" />}
               {serverStatus === 'checking' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-violet-600" />}
             </div>
-            <div className="text-[9px] sm:text-xs font-bold tracking-widest uppercase bg-violet-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-violet-200 text-violet-800">
-              {serverStatus === 'checking' ? 'Waking up Server...' : serverStatus === 'online' ? 'System: Online' : 'System: Offline'}
+            <div className="text-[9px] sm:text-xs font-bold tracking-widest text-violet-800 uppercase bg-violet-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-violet-200">
+              {serverStatus === 'checking' ? 'Waking...' : serverStatus === 'online' ? <><span className="hidden sm:inline">System: </span>Online</> : <><span className="hidden sm:inline">System: </span>Offline</>}
             </div>
           </motion.div>
         </div>
@@ -261,13 +261,13 @@ export default function Home() {
             
             <motion.div 
               animate={isDragging ? { y: -10, scale: 1.1 } : { y: 0, scale: 1 }}
-              className={`p-4 md:p-5 rounded-2xl mb-4 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-blue-700 to-violet-600 text-white shadow-violet-500/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
+              className={`p-3 md:p-5 rounded-2xl mb-3 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-blue-700 to-violet-600 text-white shadow-violet-500/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
             >
-              <CloudUpload className="w-10 h-10 md:w-12 md:h-12" strokeWidth={1.5} />
+              <CloudUpload className="w-8 h-8 md:w-12 md:h-12" strokeWidth={1.5} />
             </motion.div>
             
-            <h3 className="text-xl md:text-2xl font-extrabold text-indigo-950 mb-2 md:mb-3">
-              {isDragging ? 'Lepaskan Berkas di Sini!' : 'Tarik & Lepaskan Berkas'}
+            <h3 className="text-lg sm:text-xl md:text-2xl font-extrabold text-indigo-950 mb-2 md:mb-3">
+              {isDragging ? 'Lepaskan Berkas!' : 'Tarik & Lepaskan Berkas'}
             </h3>
             <p className="text-slate-500 text-xs sm:text-sm md:text-base mb-6 md:mb-8 max-w-md font-medium leading-relaxed px-4">
               Unggah format <span className="font-bold text-slate-700">.PDF</span> yang memuat KTP, Kartu Keluarga, dan Slip Gaji nasabah.
@@ -437,19 +437,19 @@ export default function Home() {
               )}
               {result.status.includes('READY TO DROP') ? (
                 <>
-                  <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15, delay: 0.2 }} className="p-4 md:p-5 bg-emerald-100/80 rounded-2xl text-emerald-600 mb-1 md:mb-2 shadow-inner">
-                    <ShieldCheck className="w-10 h-10 md:w-12 md:h-12" />
+                  <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15, delay: 0.2 }} className="p-3 md:p-5 bg-emerald-100/80 rounded-2xl text-emerald-600 mb-1 md:mb-2 shadow-inner">
+                    <ShieldCheck className="w-8 h-8 md:w-12 md:h-12" />
                   </motion.div>
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-emerald-800 tracking-tight">READY TO DROP</h2>
-                  <p className="text-emerald-700/80 font-bold text-sm md:text-lg max-w-xl">Bundle berkas tervalidasi dengan sempurna. Seluruh parameter memenuhi standar kepatuhan operasional.</p>
+                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-emerald-800 tracking-tight">READY TO DROP</h2>
+                  <p className="text-emerald-700/80 font-bold text-xs sm:text-sm md:text-lg max-w-xl">Bundle berkas tervalidasi dengan sempurna. Seluruh parameter memenuhi standar kepatuhan operasional.</p>
                 </>
               ) : (
                 <>
-                  <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15, delay: 0.2 }} className="p-4 md:p-5 bg-rose-100/80 rounded-2xl text-rose-600 mb-1 md:mb-2 shadow-inner">
-                    <XCircle className="w-10 h-10 md:w-12 md:h-12" />
+                  <motion.div initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 15, delay: 0.2 }} className="p-3 md:p-5 bg-rose-100/80 rounded-2xl text-rose-600 mb-1 md:mb-2 shadow-inner">
+                    <XCircle className="w-8 h-8 md:w-12 md:h-12" />
                   </motion.div>
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-rose-800 tracking-tight">REJECTED</h2>
-                  <p className="text-rose-700/80 font-bold text-sm md:text-lg max-w-xl">Terdapat dokumen yang kurang lengkap atau data identitas tidak terdeteksi dengan jelas.</p>
+                  <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-rose-800 tracking-tight">REJECTED</h2>
+                  <p className="text-rose-700/80 font-bold text-xs sm:text-sm md:text-lg max-w-xl">Terdapat dokumen yang kurang lengkap atau data identitas tidak terdeteksi dengan jelas.</p>
                 </>
               )}
             </motion.div>
@@ -525,10 +525,10 @@ function DataRow({ label, value, highlight = false }: { label: string, value: st
   const isDash = value === '-' || !value;
   return (
     <div className="group relative border-b border-slate-100 pb-4 md:pb-5 last:border-0 last:pb-0">
-      <p className="text-[10px] md:text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-1 md:mb-2 flex items-center gap-2">
+      <p className="text-[10px] md:text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-2">
         {label}
       </p>
-      <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-violet-600 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
+      <p className={`font-black tracking-tight transition-colors break-words ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-2xl sm:text-3xl md:text-4xl text-violet-600 drop-shadow-sm' : 'text-lg sm:text-xl md:text-2xl text-indigo-950'}`}>
         {value}
       </p>
     </div>
