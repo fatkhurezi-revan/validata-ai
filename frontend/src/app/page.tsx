@@ -446,12 +446,12 @@ export default function Home() {
                   <div className="p-2 md:p-2.5 bg-indigo-600/10 rounded-xl"><FileText className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /></div>
                 </div>
                 <div className="space-y-5 md:space-y-6">
-                  <DataRow label="NIK (Sesuai KTP)" value={result.data.NIK_KTP} />
-                  <DataRow label="NIK (Di Kartu Keluarga)" value={result.data.NIK_KK} />
-                  <DataRow label="Status Kecocokan NIK" value={result.data.Status_Kecocokan_NIK === true ? "✅ MATCH (Cocok)" : result.data.Status_Kecocokan_NIK === false ? "❌ MISMATCH (Berbeda)" : "-"} />
+                  <DataRow label="NIK DI KTP" value={result.data.NIK_KTP} />
+                  <DataRow label="NIK DI KK" value={result.data.NIK_KK} />
+                  <MatchStatusRow label="STATUS KECOCOKAN NIK" status={result.data.Status_Kecocokan_NIK} />
                   <DataRow label="Nama Sesuai KTP" value={result.data.Nama_KTP} />
                   <DataRow label="Nama di Slip Gaji" value={result.data.Nama_Slip_Gaji} />
-                  <DataRow label="Status Kecocokan Nama" value={result.data.Status_Kecocokan_Nama === true ? "✅ MATCH (Cocok)" : result.data.Status_Kecocokan_Nama === false ? "❌ MISMATCH (Berbeda)" : "-"} />
+                  <MatchStatusRow label="STATUS KECOCOKAN NAMA" status={result.data.Status_Kecocokan_Nama} />
                   <DataRow label="Penghasilan / Gaji" value={result.data.Gaji} highlight />
                 </div>
               </motion.div>
@@ -503,6 +503,25 @@ function DataRow({ label, value, highlight = false }: { label: string, value: st
       <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-cyan-500 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
         {value}
       </p>
+    </div>
+  );
+}
+
+function MatchStatusRow({ label, status }: { label: string, status: boolean | string | null }) {
+  if (status === null || status === undefined || status === "-") {
+    return <DataRow label={label} value="-" />;
+  }
+  
+  const isMatch = status === true;
+  return (
+    <div className="group relative border-b border-slate-100 pb-4 md:pb-5 last:border-0 last:pb-0">
+      <p className="text-[10px] md:text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+        {label}
+      </p>
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-xl border ${isMatch ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-rose-50 border-rose-200 text-rose-700'}`}>
+        {isMatch ? <BadgeCheck className="w-4 h-4 md:w-5 md:h-5" /> : <XCircle className="w-4 h-4 md:w-5 md:h-5" />}
+        <span className="font-bold text-xs md:text-sm">{isMatch ? 'MATCH (Cocok)' : 'MISMATCH (Tidak Cocok)'}</span>
+      </div>
     </div>
   );
 }
