@@ -20,7 +20,7 @@ export default function Home() {
     "Mengamankan koneksi & enkripsi...",
     "Merender halaman PDF...",
     "Mengekstrak teks via OCR...",
-    "Validasi data dengan AI..."
+    "Validasi KTP & Slip Gaji via AI..."
   ];
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function Home() {
               {isDragging ? 'Lepaskan Berkas di Sini!' : 'Tarik & Lepaskan Berkas'}
             </h3>
             <p className="text-slate-500 text-xs sm:text-sm md:text-base mb-6 md:mb-8 max-w-md font-medium leading-relaxed px-4">
-              Unggah format <span className="font-bold text-slate-700">.PDF</span> yang memuat KTP, Slip Gaji, dan Surat Perjanjian Kredit.
+              Unggah format <span className="font-bold text-slate-700">.PDF</span> yang memuat KTP dan Slip Gaji nasabah.
             </p>
             
             <input 
@@ -386,7 +386,6 @@ export default function Home() {
                 <div className="space-y-3 md:space-y-4">
                   <ChecklistItem label="KTP Nasabah" isTrue={result.kelengkapan.KTP} delay={0.1} />
                   <ChecklistItem label="Slip Gaji" isTrue={result.kelengkapan.Slip_Gaji} delay={0.2} />
-                  <ChecklistItem label="Surat Perjanjian" isTrue={result.kelengkapan.Surat_Perjanjian} delay={0.3} />
                 </div>
               </motion.div>
 
@@ -397,7 +396,9 @@ export default function Home() {
                 </div>
                 <div className="space-y-5 md:space-y-6">
                   <DataRow label="Nomor Induk Kependudukan" value={result.data.NIK} />
-                  <DataRow label="Nama Sesuai KTP" value={result.data.Nama} />
+                  <DataRow label="Nama Sesuai KTP" value={result.data.Nama_KTP} />
+                  <DataRow label="Nama di Slip Gaji" value={result.data.Nama_Slip_Gaji} />
+                  <DataRow label="Status Kecocokan Nama" value={result.data.Status_Kecocokan_Nama === true ? "✅ MATCH (Cocok)" : result.data.Status_Kecocokan_Nama === false ? "❌ MISMATCH (Berbeda)" : "-"} />
                   <DataRow label="Penghasilan / Gaji" value={result.data.Gaji} highlight />
                 </div>
               </motion.div>

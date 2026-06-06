@@ -21,17 +21,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inisialisasi EasyOCR di luar fungsi agar model tidak di-load berulang kali setiap ada request.
-# gpu=False digunakan agar aman berjalan di tier Gratis Hugging Face Spaces (berbasis CPU).
-print("Loading EasyOCR models...")
-reader = easyocr.Reader(['id', 'en'], gpu=False)
-print("EasyOCR models loaded.")
+# Inisialisasi EasyOCR (Lazy Loading) agar tidak membebani startup RAM/CPU dan menyebabkan timeout.
+reader = None
 
-# Mempersiapkan klien Groq API
-groq_api_key = os.getenv("GROQ_API_KEY")
-if not groq_api_key:
-    print("WARNING: GROQ_API_KEY tidak ditemukan! Pastikan Anda memasukkannya di environment/secrets.")
-client = Groq(api_key=groq_api_key)
+def get_easyocr_reader():
+    global reader
+    if reader is None:
+        print("Loading EasyOCR models...")
+        # Simpan model di direktori temporary yang pasti memiliki akses tulis
+        reader = easyocr.Reader(['id', 'en'], gpu=False, model_storage_directory='/tmp/easyocr')
+        print("EasyOCR models loaded.")
+    return reader
+
+# Mempersiapkan klien Groq API (diambil di dalam endpoint agar tidak crash saat startup)
+def get_groq_client():
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY belum dipasang di pengaturan rahasia (Secrets) Hugging Face.")
+    return Groq(api_key=api_key)
 
 @app.post("/analyze")
 async def analyze_document(file: UploadFile = File(...)):
@@ -58,7 +65,8 @@ async def analyze_document(file: UploadFile = File(...)):
             img_bytes = pix.tobytes("png")
             
             # Jalankan EasyOCR (detail=0 membuat response berupa list of strings)
-            ocr_results = reader.readtext(img_bytes, detail=0)
+            ocr_reader = get_easyocr_reader()
+            ocr_results = ocr_reader.readtext(img_bytes, detail=0)
             page_text = " ".join(ocr_results)
             all_text_extracted.append(page_text)
             
@@ -72,29 +80,31 @@ async def analyze_document(file: UploadFile = File(...)):
 
         # --- LANGKAH 4 & 5: ANALISIS TEKS MENGGUNAKAN GROQ API (Llama-3) ---
         system_prompt = """Anda adalah "Smart-POK AI", sebuah asisten ekstraksi data perbankan ahli.
-Tugas Anda adalah menelaah teks acak hasil OCR dokumen kredit (KTP, Slip Gaji, Surat Perjanjian).
+Tugas Anda adalah menelaah teks acak hasil OCR dokumen kredit (HANYA fokus pada KTP dan Slip Gaji).
 
 Keluarkan HANYA JSON object dengan format mutlak berikut ini (jangan tambahkan teks lain di luar JSON):
 {
   "kelengkapan": {
     "KTP": true/false,
-    "Slip_Gaji": true/false,
-    "Surat_Perjanjian": true/false
+    "Slip_Gaji": true/false
   },
   "data": {
     "NIK": "string NIK yang ditemukan (16 digit) atau '-' jika tidak ada",
-    "Nama": "string nama yang ditemukan atau '-' jika tidak ada",
-    "Gaji": "string nominal gaji yang ditemukan atau '-' jika tidak ada"
+    "Nama_KTP": "string nama yang ditemukan di bagian KTP atau '-' jika tidak ada",
+    "Nama_Slip_Gaji": "string nama yang ditemukan di bagian Slip Gaji atau '-' jika tidak ada",
+    "Gaji": "string nominal gaji yang ditemukan atau '-' jika tidak ada",
+    "Status_Kecocokan_Nama": true/false (bernilai true HANYA JIKA Nama_KTP dan Nama_Slip_Gaji identik atau sangat mirip)
   },
-  "status": "Tulis 'READY TO DROP' HANYA JIKA semua KTP, Slip_Gaji, Surat_Perjanjian true, DAN NIK/Nama/Gaji ditemukan. Jika ada satu saja yang false atau tidak ada, tulis 'REJECT'."
+  "status": "Tulis 'READY TO DROP' HANYA JIKA KTP dan Slip_Gaji bernilai true, DAN NIK/Gaji ditemukan, DAN Status_Kecocokan_Nama bernilai true. Jika ada satu saja kriteria yang tidak terpenuhi, tulis 'REJECT'."
 }
 
 Catatan Penting: 
-1. JANGAN PERNAH MENGARANG DATA. Jika teks OCR berantakan atau berasal dari dokumen acak yang tidak mengandung data identitas yang jelas, kembalikan '-' untuk NIK, Nama, dan Gaji. Dilarang keras mengembalikan nama fiktif seperti 'Budi' atau 'Budi Setiawan'.
-2. OCR bisa saja salah ketik (typo). Gunakan logika heuristik perbankan untuk mendeteksi NIK (biasanya 16 digit), Nama, dan Gaji.
-3. Surat perjanjian sering kali berisi banyak pasal-pasal panjang/syarat pinjaman."""
+1. JANGAN PERNAH MENGARANG DATA. Jika teks OCR berantakan atau acak, kembalikan '-' untuk data string. Dilarang keras mengembalikan nama fiktif.
+2. OCR bisa saja salah ketik (typo). Gunakan logika heuristik perbankan untuk mendeteksi NIK (biasanya 16 digit).
+3. Jika menemukan nama, perhatikan konteks letaknya. Nama di dekat NIK biasanya adalah Nama_KTP. Nama di dekat nominal uang/pendapatan adalah Nama_Slip_Gaji."""
 
         # Meminta respons Groq dengan format JSON
+        client = get_groq_client()
         chat_completion = client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
