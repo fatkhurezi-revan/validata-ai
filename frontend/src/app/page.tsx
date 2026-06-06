@@ -117,7 +117,14 @@ export default function Home() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error('Gagal menghubungi server AI Pusat');
+      if (!res.ok) {
+        let errMsg = 'Gagal menghubungi server AI Pusat';
+        try {
+          const errData = await res.json();
+          if (errData && errData.detail) errMsg = errData.detail;
+        } catch (e) {}
+        throw new Error(errMsg);
+      }
 
       const data = await res.json();
       
