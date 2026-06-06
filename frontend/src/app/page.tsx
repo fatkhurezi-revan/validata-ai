@@ -457,6 +457,13 @@ export default function Home() {
         )}
 
       </main>
+
+      {/* --- FOOTER --- */}
+      <footer className="w-full text-center pb-8 mt-auto z-10">
+        <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide">
+          &copy; 2026 Validata OCR. Designed &amp; Developed by Revan Fatkhurezi
+        </p>
+      </footer>
     </div>
   );
 }
