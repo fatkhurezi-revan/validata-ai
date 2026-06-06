@@ -386,7 +386,7 @@ export default function Home() {
           >
             <motion.h3 variants={itemVariants} className="text-lg md:text-xl font-bold text-indigo-950 flex items-center gap-3">
               <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-violet-600" />
-              Tentang Sistem ValidataAI
+              Tentang ValidataAI
             </motion.h3>
             <motion.div
               animate={{ rotate: showAbout ? 180 : 0 }}
