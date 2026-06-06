@@ -13,6 +13,7 @@ export default function Home() {
   const [activeStep, setActiveStep] = useState(0);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,6 +38,16 @@ export default function Home() {
       setProgress(0);
     }
   }, [isProcessing]);
+
+  useEffect(() => {
+    // Melakukan fetch sederhana ke URL backend (Hugging Face) untuk mengecek status server
+    fetch('https://revan-fatkhurezi-smart-pok-backend.hf.space/')
+      .then(res => {
+        if (res.ok) setServerStatus('online');
+        else setServerStatus('offline');
+      })
+      .catch(() => setServerStatus('offline'));
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -177,11 +188,23 @@ export default function Home() {
             <div className="p-1.5 sm:p-2 bg-gradient-to-br from-[#00529C] to-[#003D75] rounded-lg sm:rounded-xl shadow-lg shadow-[#00529C]/30">
               <ShieldCheck className="text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-[#00529C]">Smart-POK <span className="text-[#F37021]">AI</span></span>
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-[#00529C]">Validata <span className="text-[#F37021]">OCR</span></span>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <div className="text-[9px] sm:text-xs font-bold tracking-widest text-slate-500 uppercase bg-white/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-slate-100">KCP Sukanagara</div>
+            <div className="relative flex items-center justify-center">
+              {serverStatus === 'checking' && <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500 animate-pulse" />}
+              {serverStatus === 'online' && (
+                <>
+                  <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-ping opacity-75" />
+                  <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500" />
+                </>
+              )}
+              {serverStatus === 'offline' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500" />}
+              {serverStatus === 'checking' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500" />}
+            </div>
+            <div className="text-[9px] sm:text-xs font-bold tracking-widest text-slate-500 uppercase bg-white/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-slate-100">
+              {serverStatus === 'checking' ? 'Waking up Server...' : serverStatus === 'online' ? 'System: Online' : 'System: Offline'}
+            </div>
           </motion.div>
         </div>
       </nav>
@@ -201,7 +224,7 @@ export default function Home() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F37021] to-[#FF8C42]"> Super Cerdas</span>
           </motion.h1>
           <motion.p variants={itemVariants} className="text-slate-500 text-sm sm:text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed px-2">
-            Asisten administrasi berbasis AI Generatif. Ekstraksi dan validasi bundle berkas nasabah dalam hitungan detik.
+            Sistem otomasi ekstraksi OCR. Memvalidasi kelengkapan serta mencocokkan NIK, Nama, dan Nominal Gaji secara real-time.
           </motion.p>
         </motion.div>
 
@@ -346,6 +369,24 @@ export default function Home() {
             )}
           </AnimatePresence>
 
+        </motion.div>
+
+        <motion.div 
+          initial="hidden" animate="visible" variants={containerVariants}
+          className="bg-slate-50/50 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl md:rounded-[2rem] border border-slate-200/60 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.03)]"
+        >
+          <motion.h3 variants={itemVariants} className="text-lg md:text-xl font-bold text-[#00529C] mb-3 md:mb-5 flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-[#F37021]" />
+            Tentang Sistem Validata OCR
+          </motion.h3>
+          <motion.div variants={itemVariants} className="space-y-3 md:space-y-4 text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-medium">
+            <p>
+              Validata OCR lahir dari observasi langsung di lapangan selama masa magang di PT Bank Rakyat Indonesia (Persero) Tbk, KCP Sukanagara. Saat ditugaskan membantu operasional bagian administrasi, ditemukan adanya celah inefisiensi pada proses kerja POK, di mana pengecekan dan pencocokan silang dokumen KTP serta Slip Gaji nasabah masih dilakukan secara manual dan memakan waktu.
+            </p>
+            <p>
+              Sebagai solusi teknologi yang konkret, sistem ekstraksi OCR berbasis AI Generatif ini dirancang untuk mengotomatisasi proses tersebut. Aplikasi ini dikembangkan tidak hanya sebagai implementasi teknis untuk Laporan Magang, tetapi juga sebagai prototipe nyata digitalisasi alur kerja perbankan untuk memangkas waktu validasi berkas dari hitungan menit menjadi hanya beberapa detik.
+            </p>
+          </motion.div>
         </motion.div>
 
         {result && (
