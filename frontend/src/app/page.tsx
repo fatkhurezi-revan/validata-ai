@@ -175,7 +175,7 @@ export default function Home() {
         />
         <motion.div 
           animate={{ scale: [1, 1.2, 1], rotate: [0, -5, 0] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[20%] -right-[10%] w-[70%] md:w-[40%] h-[60%] rounded-full bg-gradient-to-bl from-amber-400/10 to-transparent blur-[100px] md:blur-[120px]" 
+          className="absolute top-[20%] -right-[10%] w-[70%] md:w-[40%] h-[60%] rounded-full bg-gradient-to-bl from-violet-400/10 to-transparent blur-[100px] md:blur-[120px]" 
         />
         <motion.div 
           animate={{ scale: [1, 1.15, 1], rotate: [0, 10, 0] }} transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
@@ -188,11 +188,11 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
             {/* Logo Anda */}
             <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-sm" />
-            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950 ml-1">Validata<span className="text-amber-500">AI</span></span>
+            <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-indigo-950 ml-1">Validata<span className="text-violet-600">AI</span></span>
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 sm:gap-3">
             <div className="relative flex items-center justify-center">
-              {serverStatus === 'checking' && <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500 animate-pulse" />}
+              {serverStatus === 'checking' && <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-violet-600 animate-pulse" />}
               {serverStatus === 'online' && (
                 <>
                   <span className="absolute w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-ping opacity-75" />
@@ -200,9 +200,9 @@ export default function Home() {
                 </>
               )}
               {serverStatus === 'offline' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-500" />}
-              {serverStatus === 'checking' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500" />}
+              {serverStatus === 'checking' && <span className="relative w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-violet-600" />}
             </div>
-            <div className="text-[9px] sm:text-xs font-bold tracking-widest text-slate-500 uppercase bg-white/80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-slate-100">
+            <div className="text-[9px] sm:text-xs font-bold tracking-widest uppercase bg-violet-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm border border-violet-200 text-violet-800">
               {serverStatus === 'checking' ? 'Waking up Server...' : serverStatus === 'online' ? 'System: Online' : 'System: Offline'}
             </div>
           </motion.div>
@@ -215,13 +215,13 @@ export default function Home() {
           className="text-center space-y-4 md:space-y-5"
           initial="hidden" animate="visible" variants={containerVariants}
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/80 border border-slate-200 shadow-sm text-xs md:text-sm font-semibold text-indigo-950 mb-1 md:mb-2 backdrop-blur-md">
-            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500" />
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-violet-100 border border-violet-200 shadow-sm text-xs md:text-sm font-semibold text-violet-800 mb-1 md:mb-2 backdrop-blur-md">
+            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-violet-600" />
             Validasi Dokumen Enterprise
           </motion.div>
           <motion.h1 variants={itemVariants} className="text-3xl sm:text-5xl md:text-6xl font-black text-indigo-950 tracking-tight leading-tight drop-shadow-sm">
             Validasi Kredit <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-blue-500"> Super Cerdas</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-violet-700"> Super Cerdas</span>
           </motion.h1>
           <motion.p variants={itemVariants} className="text-slate-500 text-sm sm:text-base md:text-xl max-w-2xl mx-auto font-medium leading-relaxed px-2">
             Sistem otomasi ekstraksi OCR. Memvalidasi kelengkapan serta mencocokkan NIK, Nama, dan Nominal Gaji secara real-time.
@@ -242,21 +242,21 @@ export default function Home() {
             onClick={triggerFileInput}
             className={`relative cursor-pointer rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-14 transition-all duration-500 ease-out flex flex-col items-center justify-center text-center overflow-hidden border-2 ${
               isDragging 
-                ? 'border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)] bg-amber-400/5 scale-[0.98]' 
+                ? 'border-violet-400 shadow-[0_0_15px_rgba(124,58,237,0.5)] bg-violet-400/5 scale-[0.98]' 
                 : 'border-slate-200 border-dashed hover:border-indigo-600/40 hover:bg-indigo-950/[0.02] hover:shadow-inner'
             }`}
           >
             {isDragging && (
               <motion.div 
                 layoutId="drag-ring"
-                className="absolute inset-0 border-4 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]/20 rounded-2xl md:rounded-3xl"
+                className="absolute inset-0 border-4 border-violet-400 shadow-[0_0_15px_rgba(124,58,237,0.5)]/20 rounded-2xl md:rounded-3xl"
                 initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
               />
             )}
             
             <motion.div 
               animate={isDragging ? { y: -10, scale: 1.1 } : { y: 0, scale: 1 }}
-              className={`p-4 md:p-5 rounded-2xl mb-4 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-amber-500 to-blue-500 text-white shadow-amber-400/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
+              className={`p-4 md:p-5 rounded-2xl mb-4 md:mb-6 transition-all duration-500 shadow-xl ${isDragging ? 'bg-gradient-to-br from-blue-700 to-violet-600 text-white shadow-violet-500/30' : 'bg-white text-indigo-950 shadow-indigo-600/10 group-hover:-translate-y-2 group-hover:shadow-2xl'}`}
             >
               <CloudUpload className="w-10 h-10 md:w-12 md:h-12" strokeWidth={1.5} />
             </motion.div>
@@ -291,7 +291,7 @@ export default function Home() {
                 initial={{opacity:0, y:20, scale:0.95}} animate={{opacity:1, y:0, scale:1}} exit={{opacity:0, scale:0.95}} transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 className="mt-6 md:mt-8 p-4 md:p-5 bg-white rounded-2xl border border-slate-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500" />
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-violet-600" />
                 <div className="flex items-center gap-3 md:gap-4 w-full pl-2">
                   <div className="p-2 md:p-3 bg-slate-50 rounded-xl text-indigo-950 shrink-0">
                     <FileText className="w-6 h-6 md:w-7 md:h-7" />
@@ -304,7 +304,7 @@ export default function Home() {
                 <motion.button 
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                  className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-amber-500 to-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-400/30 hover:shadow-[#F37021]/50 shrink-0 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-blue-800 to-violet-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-violet-400/30 hover:shadow-[#F37021]/50 shrink-0 flex items-center justify-center gap-2"
                 >
                   <Sparkles className="w-4 h-4" />
                   Mulai Analisis
@@ -323,16 +323,16 @@ export default function Home() {
               >
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h4 className="font-bold text-indigo-950 text-sm md:text-lg flex items-center gap-2 md:gap-3">
-                    <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-amber-500" />
+                    <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-violet-600" />
                     AI Bekerja...
                   </h4>
-                  <span className="text-2xl md:text-3xl font-black text-slate-200">{progress}%</span>
+                  <span className="text-2xl md:text-3xl font-black text-blue-900">{progress}%</span>
                 </div>
 
                 <div className="space-y-4 md:space-y-5">
                   {steps.map((step, idx) => (
                     <div key={idx} className={`flex items-center gap-3 md:gap-4 transition-all duration-500 ${idx === activeStep ? 'opacity-100 scale-100' : idx < activeStep ? 'opacity-40' : 'opacity-20'}`}>
-                      <div className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-[10px] md:text-sm transition-colors duration-500 ${idx < activeStep ? 'bg-emerald-500 text-white' : idx === activeStep ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/40' : 'bg-slate-100 text-slate-400'}`}>
+                      <div className={`shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-[10px] md:text-sm transition-colors duration-500 ${idx < activeStep ? 'bg-emerald-500 text-white' : idx === activeStep ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/40' : 'bg-slate-100 text-slate-400'}`}>
                         {idx < activeStep ? '✓' : idx + 1}
                       </div>
                       <span className={`font-semibold text-xs md:text-base ${idx === activeStep ? 'text-indigo-950' : 'text-slate-500'}`}>{step}</span>
@@ -342,7 +342,7 @@ export default function Home() {
 
                 <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden relative mt-6 md:mt-8">
                   <motion.div 
-                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-700 via-indigo-500 to-amber-400 rounded-full"
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
@@ -380,7 +380,7 @@ export default function Home() {
             className="w-full flex items-center justify-between p-6 sm:p-8 md:p-10 text-left hover:bg-slate-100/50 transition-colors"
           >
             <motion.h3 variants={itemVariants} className="text-lg md:text-xl font-bold text-indigo-950 flex items-center gap-3">
-              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
+              <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-violet-600" />
               Tentang Sistem ValidataAI
             </motion.h3>
             <motion.div
@@ -454,7 +454,7 @@ export default function Home() {
               <motion.div variants={itemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Kelengkapan</h3>
-                  <div className="p-2 md:p-2.5 bg-amber-500/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-amber-500" /></div>
+                  <div className="p-2 md:p-2.5 bg-violet-600/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-violet-600" /></div>
                 </div>
                 <div className="space-y-3 md:space-y-4">
                   <ChecklistItem label="KTP Nasabah" isTrue={result.kelengkapan.KTP} delay={0.1} />
@@ -523,7 +523,7 @@ function DataRow({ label, value, highlight = false }: { label: string, value: st
       <p className="text-[10px] md:text-[12px] font-bold text-slate-400 uppercase tracking-wider mb-1 md:mb-2 flex items-center gap-2">
         {label}
       </p>
-      <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-amber-500 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
+      <p className={`font-black tracking-tight transition-colors ${isDash ? 'text-slate-300 italic font-medium text-base md:text-lg' : highlight ? 'text-3xl md:text-4xl text-violet-600 drop-shadow-sm' : 'text-xl md:text-2xl text-indigo-950'}`}>
         {value}
       </p>
     </div>
