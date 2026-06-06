@@ -126,6 +126,24 @@ Catatan Penting (WAJIB DIPATUHI):
         # Parsing string tersebut ke Python Dictionary
         result_json = json.loads(groq_json_str)
         
+        # --- VERIFIKASI STATUS SECARA DETERMINISTIK MENGGUNAKAN PYTHON ---
+        # Jangan percayakan penentuan status akhir pada AI karena bisa meleset.
+        kelengkapan = result_json.get("kelengkapan", {})
+        data_ekstraksi = result_json.get("data", {})
+        
+        is_ktp_ok = kelengkapan.get("KTP") is True
+        is_kk_ok = kelengkapan.get("Kartu_Keluarga") is True
+        is_slip_ok = kelengkapan.get("Slip_Gaji") is True
+        
+        is_nik_ada = data_ekstraksi.get("NIK") != "-"
+        is_gaji_ada = data_ekstraksi.get("Gaji") != "-"
+        is_nama_cocok = data_ekstraksi.get("Status_Kecocokan_Nama") is True
+        
+        if is_ktp_ok and is_kk_ok and is_slip_ok and is_nik_ada and is_gaji_ada and is_nama_cocok:
+            result_json["status"] = "READY TO DROP"
+        else:
+            result_json["status"] = "REJECTED"
+        
         # --- LANGKAH 6: KEMBALIKAN RESPONSE JSON KE FRONTEND ---
         return result_json
 
