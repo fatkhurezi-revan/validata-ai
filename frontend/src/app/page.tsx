@@ -16,8 +16,6 @@ export default function Home() {
   const [serverStatus, setServerStatus] = useState<'checking' | 'online' | 'offline'>('checking');
   const [showAbout, setShowAbout] = useState(false);
 
-
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const steps = [
@@ -43,7 +41,7 @@ export default function Home() {
   }, [isProcessing]);
 
   useEffect(() => {
-    // Melakukan fetch sederhana ke URL backend (Hugging Face) untuk mengecek status server
+    
     fetch('https://revan-fatkhurezi-smart-pok-backend.hf.space/')
       .then(res => {
         if (res.ok) setServerStatus('online');
@@ -179,7 +177,7 @@ const resultItemVariants: Variants = {
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-slate-800 font-sans selection:bg-indigo-950/20 relative overflow-x-hidden flex flex-col">
       
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 hidden md:block">
         <motion.div 
           animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute -top-[10%] -left-[10%] w-[80%] md:w-[50%] h-[50%] rounded-full bg-gradient-to-br from-blue-600/10 to-transparent blur-[100px] md:blur-[120px]" 
@@ -201,7 +199,7 @@ const resultItemVariants: Variants = {
             onClick={() => window.location.reload()}
             className="flex items-center gap-1.5 sm:gap-2 hover:opacity-80 transition-opacity focus:outline-none cursor-pointer"
           >
-            {/* Logo Anda */}
+            
             <img src="/validata-ai-logo.png" alt="ValidataAI Logo" className="w-7 h-7 sm:w-8 sm:h-8 object-contain drop-shadow-sm pointer-events-none select-none" />
             <span className="font-extrabold text-lg sm:text-xl tracking-tight text-indigo-950">Validata<span className="text-violet-600">AI</span></span>
           </motion.button>
@@ -242,7 +240,7 @@ const resultItemVariants: Variants = {
 
         <motion.div 
           whileHover={{ scale: 1.01, y: -5 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-          className="bg-white/70 backdrop-blur-2xl p-5 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,82,156,0.1)] hover:shadow-[0_30px_70px_-15px_rgba(0,82,156,0.15)] border border-white/60 relative overflow-hidden group"
+          className="bg-white/70 backdrop-blur-md md:backdrop-blur-2xl p-5 sm:p-8 md:p-12 rounded-3xl md:rounded-[2rem] shadow-lg md:shadow-[0_20px_60px_-15px_rgba(0,82,156,0.1)] hover:shadow-xl md:hover:shadow-[0_30px_70px_-15px_rgba(0,82,156,0.15)] border border-white/60 relative overflow-hidden group"
           initial="hidden" animate="visible" variants={containerVariants}
         >
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 transform -translate-x-full group-hover:translate-x-full ease-in-out pointer-events-none" />
@@ -462,9 +460,9 @@ const resultItemVariants: Variants = {
               )}
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               
-              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
+              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-sm md:backdrop-blur-xl p-5 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-md md:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-lg md:hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Kelengkapan</h3>
                   <div className="p-2 md:p-2.5 bg-violet-600/10 rounded-xl"><BadgeCheck className="w-5 h-5 md:w-6 md:h-6 text-violet-600" /></div>
@@ -476,7 +474,7 @@ const resultItemVariants: Variants = {
                 </div>
               </motion.div>
 
-              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl md:rounded-[2rem] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-xl transition-shadow">
+              <motion.div variants={resultItemVariants} className="bg-white/80 backdrop-blur-sm md:backdrop-blur-xl p-5 sm:p-6 md:p-8 rounded-2xl md:rounded-[2rem] shadow-md md:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 hover:shadow-lg md:hover:shadow-xl transition-shadow">
                 <div className="flex items-center justify-between mb-6 md:mb-8">
                   <h3 className="text-lg md:text-xl font-black text-indigo-950">Ekstraksi Data</h3>
                   <div className="p-2 md:p-2.5 bg-indigo-600/10 rounded-xl"><FileText className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /></div>
@@ -498,7 +496,7 @@ const resultItemVariants: Variants = {
 
       </main>
 
-      {/* --- FOOTER --- */}
+      
       <footer className="w-full text-center pb-8 mt-auto z-10">
         <p className="text-xs sm:text-sm text-slate-400 font-medium tracking-wide">
           &copy; 2026 ValidataAI. Designed &amp; Developed by Revan Fatkhurezi
