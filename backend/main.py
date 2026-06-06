@@ -135,7 +135,10 @@ Catatan Penting (WAJIB DIPATUHI):
                "KEPALA KELUARGA" in text_upper or \
                "NO. KK" in text_upper or \
                "NOMOR KK" in text_upper or \
-               "STATUS PERKAWINAN" in text_upper:
+               "STATUS PERKAWINAN" in text_upper or \
+               "HUBUNGAN KELUARGA" in text_upper or \
+               "PENDIDIKAN" in text_upper or \
+               "JENIS PEKERJAAN" in text_upper:
                 result_json["kelengkapan"]["Kartu_Keluarga"] = True
 
         # Deteksi KTP:
